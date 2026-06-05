@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: todo
+  cloud:
+    aws:
+      region: eu-west-2
+      endpoint: http://localhost:4566
+      dynamodb:
+        region: eu-west-2
+      credentials:
+        access-key: test
+        secret-key: test
+app:
+  dynamodb:
+    todoTable: todo
