@@ -24,11 +24,11 @@ class ToDoRepositoryTest {
         this.toDoRepository = toDoRepository;
     }
 
-//    @BeforeEach
-//    @AfterEach
-//    void clearDB() {
-//        toDoRepository.clear();
-//    }
+    @BeforeEach
+    @AfterEach
+    void clearDB() {
+        toDoRepository.clear();
+    }
 
     @Test
     void repositoryIsAutowired() {
@@ -43,5 +43,19 @@ class ToDoRepositoryTest {
         var retrieved = toDoRepository.retrieve(todo.getId());
 
         assertEquals(todo, retrieved);
+    }
+
+    @Test
+    void canDeleteAnExistingTodo() {
+        ToDoEntity todo = new ToDoEntity(UUID.randomUUID().toString(), "title", "desc", "assignee", LocalDate.now().toString());
+
+        toDoRepository.save(todo);
+
+        assertTrue(toDoRepository.delete(todo.getId()));
+    }
+
+    @Test
+    void failsOnDeleteNonExisting() {
+        assertFalse(toDoRepository.delete("DOES_NOT_EXIST"));
     }
 }
