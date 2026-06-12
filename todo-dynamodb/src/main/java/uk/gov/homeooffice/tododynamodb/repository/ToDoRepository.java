@@ -5,9 +5,12 @@ import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.endpoints.internal.GetAttr;
+import uk.gov.homeooffice.tododynamodb.model.dtos.ToDoDTO;
 import uk.gov.homeooffice.tododynamodb.model.entities.ToDoEntity;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class ToDoRepository {
@@ -25,13 +28,20 @@ public class ToDoRepository {
         todos.putItem(todo);
     }
 
-    public ToDoEntity retrieve(final String id) {
-        return todos.getItem(request -> request.key(key->key.partitionValue(id)));
+    public Optional<ToDoEntity> retrieve(final String id) {
+        return Optional.ofNullable(todos.getItem(request -> request.key(key->key.partitionValue(id))));
     }
 
     public boolean delete(String id) {
         var previousTodo = todos.deleteItem(Key.builder().partitionValue(id).build());
-        return !Objects.isNull(previousTodo);
+        return Objects.nonNull(previousTodo);
+    }
+
+    public List<ToDoDTO> retrieveAll() {
+        // Expensive in real life. Don't use Dynamo if you need table scans.
+        return todos.scan().items().stream()
+                .map(ToDoDTO::fromToDoEntity)
+                .toList();
     }
 
     // For testing
@@ -39,4 +49,6 @@ public class ToDoRepository {
         var todoList = todos.scan().items().stream().toList();
         todoList.forEach(todos::deleteItem);
     }
+
+
 }

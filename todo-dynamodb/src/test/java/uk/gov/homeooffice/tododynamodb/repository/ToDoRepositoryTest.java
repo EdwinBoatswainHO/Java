@@ -42,7 +42,8 @@ class ToDoRepositoryTest {
         toDoRepository.save(todo);
         var retrieved = toDoRepository.retrieve(todo.getId());
 
-        assertEquals(todo, retrieved);
+        assertTrue(retrieved.isPresent());
+        assertEquals(todo, retrieved.get());
     }
 
     @Test

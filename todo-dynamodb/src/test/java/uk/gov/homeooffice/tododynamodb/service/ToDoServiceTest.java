@@ -1,17 +1,13 @@
 package uk.gov.homeooffice.tododynamodb.service;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.stereotype.Service;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.homeooffice.tododynamodb.model.dtos.CreateToDoDTO;
 import uk.gov.homeooffice.tododynamodb.model.entities.ToDoEntity;
@@ -47,7 +43,7 @@ class ToDoServiceTest {
                         .assignee("Child one")
                         .build();
 
-        var result = toDoService.createTodo(newToDo);
+        var result = toDoService.createToDo(newToDo);
 
         assertNotNull(result.getId());
 
@@ -78,7 +74,7 @@ class ToDoServiceTest {
                 .assignee("Child one")
                 .build();
 
-        var result = toDoService.createTodo(newToDo);
+        var result = toDoService.createToDo(newToDo);
 
         assertNotNull(result.getId());
 
