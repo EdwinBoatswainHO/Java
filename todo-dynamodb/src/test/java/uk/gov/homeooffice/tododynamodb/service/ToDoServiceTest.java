@@ -10,10 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.homeooffice.tododynamodb.model.dtos.CreateToDoDTO;
+import uk.gov.homeooffice.tododynamodb.model.dtos.ToDoDTO;
 import uk.gov.homeooffice.tododynamodb.model.entities.ToDoEntity;
 import uk.gov.homeooffice.tododynamodb.repository.ToDoRepository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -27,6 +30,8 @@ class ToDoServiceTest {
     private ToDoRepository repository;
     @Autowired
     private ToDoService toDoService;
+    @Autowired
+    private ToDoRepository toDoRepository;
 
     @BeforeEach
     void resetMocks() {
@@ -93,5 +98,40 @@ class ToDoServiceTest {
 
         ToDoEntity saved = captor.getValue();
         assertEquals(expectedEntity, saved);
+    }
+
+    @Test
+    void givenIdDoesNotExist_throwsIllegalArgumentException() {
+
+        when(repository.retrieve(any())).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> toDoService.retrieveById(UUID.randomUUID()));
+
+    }
+
+    @Test
+    void givenIdDoesExist_ToDoIsRetrieved() {
+        ToDoDTO expected = ToDoDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Mow the lawn.")
+                .description("It's just too long. Stripes please.")
+                .due(LocalDateTime.now())
+                .assignee("Child one")
+                .build();
+        var fetchedEntity = ToDoEntity.builder()
+                .id(expected.getId().toString())
+                .title(expected.getTitle())
+                .description(expected.getDescription())
+                .due(expected.getDue().toString())
+                .assignee(expected.getAssignee())
+                .build();
+
+        when(repository.retrieve(expected.getId().toString()))
+                .thenReturn(Optional.of(fetchedEntity));
+
+        var result = toDoService.retrieveById(expected.getId());
+
+        assertEquals(expected, result);
     }
 }
