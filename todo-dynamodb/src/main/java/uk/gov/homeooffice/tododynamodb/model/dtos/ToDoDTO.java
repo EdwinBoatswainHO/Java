@@ -3,6 +3,7 @@ package uk.gov.homeooffice.tododynamodb.model.dtos;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 import uk.gov.homeooffice.tododynamodb.model.entities.ToDoEntity;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,8 @@ public class ToDoDTO {
     private String description;
     private String assignee;
     private LocalDateTime due;
+    @NonNull
+    private LocalDateTime createdAt;
 
     public static ToDoDTO fromToDoEntity(ToDoEntity entity) {
         var due = entity.getDue();
@@ -41,6 +44,7 @@ public class ToDoDTO {
                 .description(entity.getDescription())
                 .assignee(entity.getAssignee())
                 .due(dueDt)
+                .createdAt(LocalDateTime.parse(entity.getCreatedAt()))
                 .build();
     }
 

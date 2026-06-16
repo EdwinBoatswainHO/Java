@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.homeooffice.tododynamodb.model.entities.ToDoEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +38,7 @@ class ToDoRepositoryTest {
 
     @Test
     void canSaveAndRetrieveAToDo() {
-        ToDoEntity todo = new ToDoEntity(UUID.randomUUID().toString(), "title", "desc", "assignee", LocalDate.now().toString());
+        ToDoEntity todo = new ToDoEntity(UUID.randomUUID().toString(), "title", "desc", "assignee", LocalDate.now().toString(), LocalDateTime.now().toString());
 
         toDoRepository.save(todo);
         var retrieved = toDoRepository.retrieve(todo.getId());
@@ -48,7 +49,7 @@ class ToDoRepositoryTest {
 
     @Test
     void canDeleteAnExistingTodo() {
-        ToDoEntity todo = new ToDoEntity(UUID.randomUUID().toString(), "title", "desc", "assignee", LocalDate.now().toString());
+        ToDoEntity todo = new ToDoEntity(UUID.randomUUID().toString(), "title", "desc", "assignee", LocalDate.now().toString(), LocalDateTime.now().toString());
 
         toDoRepository.save(todo);
 
@@ -58,5 +59,19 @@ class ToDoRepositoryTest {
     @Test
     void failsOnDeleteNonExisting() {
         assertFalse(toDoRepository.delete("DOES_NOT_EXIST"));
+    }
+
+    @Test
+    void canClearRepo() {
+        for (int i = 0; i < 10; i++) {
+            ToDoEntity todo = new ToDoEntity(UUID.randomUUID().toString(), "title", "desc", "assignee", LocalDate.now().toString(), LocalDateTime.now().toString());
+            toDoRepository.save(todo);
+        }
+
+        assertEquals(10, toDoRepository.retrieveAll().size());
+
+        toDoRepository.clear();
+
+        assertEquals(0, toDoRepository.retrieveAll().size());
     }
 }

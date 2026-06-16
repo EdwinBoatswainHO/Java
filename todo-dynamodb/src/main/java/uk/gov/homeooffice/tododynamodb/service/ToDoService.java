@@ -7,6 +7,7 @@ import uk.gov.homeooffice.tododynamodb.model.dtos.ToDoDTO;
 import uk.gov.homeooffice.tododynamodb.model.entities.ToDoEntity;
 import uk.gov.homeooffice.tododynamodb.repository.ToDoRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -26,7 +27,8 @@ public class ToDoService {
                 in.getTitle(),
                 in.getDescription(),
                 in.getAssignee(),
-                Objects.isNull(in.getDue()) ? null : in.getDue().toString()
+                Objects.isNull(in.getDue()) ? null : in.getDue().toString(),
+                LocalDateTime.now().toString()
         );
 
         repository.save(toDoEntity);
@@ -64,7 +66,8 @@ public class ToDoService {
                 toDo.getTitle(),
                 toDo.getDescription(),
                 toDo.getAssignee(),
-                toDo.getDue().toString()));
+                toDo.getDue().toString(),
+                toDo.getCreatedAt().toString()));
     }
 
     public void deleteById(UUID id)

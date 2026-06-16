@@ -67,6 +67,7 @@ class ToDoServiceTest {
 
         ToDoEntity saved = captor.getValue();
         assertEquals(expectedEntity, saved);
+        assertNotNull(saved.getCreatedAt());
     }
 
     @Test
@@ -98,6 +99,7 @@ class ToDoServiceTest {
 
         ToDoEntity saved = captor.getValue();
         assertEquals(expectedEntity, saved);
+        assertNotNull(saved.getCreatedAt());
     }
 
     @Test
@@ -118,6 +120,7 @@ class ToDoServiceTest {
                 .description("It's just too long. Stripes please.")
                 .due(LocalDateTime.now())
                 .assignee("Child one")
+                .createdAt(LocalDateTime.now())
                 .build();
         var fetchedEntity = ToDoEntity.builder()
                 .id(expected.getId().toString())
@@ -125,6 +128,7 @@ class ToDoServiceTest {
                 .description(expected.getDescription())
                 .due(expected.getDue().toString())
                 .assignee(expected.getAssignee())
+                .createdAt(expected.getCreatedAt().toString())
                 .build();
 
         when(repository.retrieve(expected.getId().toString()))
@@ -133,5 +137,6 @@ class ToDoServiceTest {
         var result = toDoService.retrieveById(expected.getId());
 
         assertEquals(expected, result);
+        assertNotNull(fetchedEntity.getCreatedAt());
     }
 }

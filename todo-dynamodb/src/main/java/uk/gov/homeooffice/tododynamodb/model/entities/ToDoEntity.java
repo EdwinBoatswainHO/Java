@@ -14,6 +14,8 @@ public class ToDoEntity {
     private String description;
     private String assignee;
     private String due;
+    @EqualsAndHashCode.Exclude
+    private String createdAt;
 
     @Setter(AccessLevel.NONE)
     private Long version;
@@ -31,11 +33,12 @@ public class ToDoEntity {
     }
 
     @Builder
-    public ToDoEntity(String id, String title, String description, String assignee, String due) {
+    public ToDoEntity(String id, String title, String description, String assignee, String due, String createdAt) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.assignee = assignee;
         this.due = due;
+        this.createdAt = createdAt;
     }
 }
