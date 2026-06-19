@@ -1,5 +1,7 @@
 package uk.gov.homeooffice.tododynamodb.controller;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +26,19 @@ public class ToDoController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "created")
+    })
     public ToDoDTO create(@RequestBody CreateToDoDTO in) {
         return toDoService.createToDo(in);
     }
 
     @GetMapping("/get/{id}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Found"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+
+    })
     public ResponseEntity<ToDoDTO> get(@PathVariable UUID id) {
         try {
             var tooDo = toDoService.retrieveById(id);
@@ -39,6 +49,9 @@ public class ToDoController {
     }
 
     @GetMapping("/get-all")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK")
+    })
     public List<ToDoDTO> getAll() {
         return toDoService.getToDos();
     }
@@ -54,6 +67,11 @@ public class ToDoController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Found"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+
+    })
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         try {
             toDoService.deleteById(id);
