@@ -66,7 +66,7 @@ public class ToDoService {
                 toDo.getTitle(),
                 toDo.getDescription(),
                 toDo.getAssignee(),
-                toDo.getDue().toString(),
+                Objects.isNull(toDo.getDue()) ? null : toDo.getDue().toString(),
                 toDo.getCreatedAt().toString()));
     }
 

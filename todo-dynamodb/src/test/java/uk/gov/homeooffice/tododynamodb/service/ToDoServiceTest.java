@@ -17,7 +17,9 @@ import uk.gov.homeooffice.tododynamodb.repository.ToDoRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -103,7 +105,7 @@ class ToDoServiceTest {
     }
 
     @Test
-    void givenIdDoesNotExist_throwsIllegalArgumentException() {
+    void givenIdDoesNotExist_createToDo_throwsIllegalArgumentException() {
 
         when(repository.retrieve(any())).thenReturn(Optional.empty());
 
@@ -113,7 +115,7 @@ class ToDoServiceTest {
     }
 
     @Test
-    void givenIdDoesExist_ToDoIsRetrieved() {
+    void givenIdDoesExist_retrieveToDo_ToDoIsRetrieved() {
         ToDoDTO expected = ToDoDTO.builder()
                 .id(UUID.randomUUID())
                 .title("Mow the lawn.")
@@ -138,5 +140,85 @@ class ToDoServiceTest {
 
         assertEquals(expected, result);
         assertNotNull(fetchedEntity.getCreatedAt());
+    }
+
+    @Test
+    void givenSomeTodDos_retrieveAll_getsAllTheToDos() {
+        var toDos = IntStream.rangeClosed(1, 10)
+                .mapToObj(i -> ToDoDTO.builder()
+                        .id(UUID.randomUUID())
+                        .title("I am number " + i)
+                        .description("This is ToDo number " + i)
+                        .due(null)
+                        .createdAt(LocalDateTime.now())
+                        .assignee("Team Rocket")
+                        .build()
+                )
+                .toList();
+
+        when(repository.retrieveAll()).thenReturn(toDos);
+
+        var result = toDoService.getToDos();
+        verify(repository, times(1)).retrieveAll();
+
+        // pointless as mock but
+        assertThat(result).containsExactlyInAnyOrderElementsOf(toDos);
+    }
+
+    @Test
+    void givenAnExistingTodo_updateTodo_todoIsUpdated() {
+        ToDoDTO todo = ToDoDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Mow the lawn.")
+                .description("It's just too long. Stripes please.")
+                .createdAt(LocalDateTime.now())
+                .due(null)
+                .assignee("Child one")
+                .build();
+
+        var DBEntity = ToDoEntity.from(todo);
+
+        when(repository.retrieve(any())).thenReturn(Optional.of(DBEntity));
+        toDoService.updateToDo(todo);
+        verify(repository,times(1)).save(DBEntity); // updates the one returned
+
+        // assert the same with due date - for coverage
+        todo.setDue(LocalDateTime.now().minusDays(1));
+        DBEntity.setDue(todo.getDue().toString());
+        toDoService.updateToDo(todo);
+        verify(repository,times(1)).save(DBEntity); // updates the one returned
+    }
+
+    @Test
+    void givenNonExistingToDo_updateTodo_throwsIllegalArgumentExceptions() {
+        ToDoDTO todo = ToDoDTO.builder()
+                .id(UUID.randomUUID())
+                .title("Mow the lawn.")
+                .description("It's just too long. Stripes please.")
+                .createdAt(LocalDateTime.now())
+                .due(null)
+                .assignee("Child one")
+                .build();
+        when(repository.retrieve(any())).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> toDoService.updateToDo(todo));
+    }
+
+    @Test
+    void givenExistingTodo_deleteById_deletesToDo() {
+        UUID existing = UUID.randomUUID();
+
+        when(repository.delete(existing.toString())).thenReturn(true);
+        toDoService.deleteById(existing);
+
+        verify(repository, times(1)).delete(existing.toString());
+    }
+
+    @Test
+    void givenNonExistentToDo_deleteById_throwsIllegalArgumentException() {
+        UUID existing = UUID.randomUUID();
+
+        when(repository.delete(existing.toString())).thenReturn(false);
+        assertThrows(IllegalArgumentException.class, () -> toDoService.deleteById(existing));
     }
 }
