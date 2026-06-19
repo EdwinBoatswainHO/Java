@@ -8,9 +8,8 @@ import uk.gov.homeooffice.tododynamodb.model.entities.ToDoEntity;
 import uk.gov.homeooffice.tododynamodb.repository.ToDoRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ToDoService {
@@ -48,7 +47,11 @@ public class ToDoService {
     // Order is arbitrary, downside of not using a numeric ID.
     // Perhaps introduce creation date / time
     public List<ToDoDTO> getToDos() {
-        return repository.retrieveAll();
+        var todos = repository.retrieveAll();
+        // Hack - should annotate as soft key in database and query with scanindexForward(true);
+        var sorted = new ArrayList<ToDoDTO>(todos);
+        sorted.sort(Comparator.comparing(ToDoDTO::getCreatedAt));
+        return sorted;
     }
 
     public void updateToDo(ToDoDTO toDo)

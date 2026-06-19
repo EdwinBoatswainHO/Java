@@ -43,7 +43,7 @@ public class ToDoController {
         return toDoService.getToDos();
     }
 
-    @PutMapping
+    @PutMapping("/update")
     public ResponseEntity<Void> update(@RequestBody ToDoDTO updated) {
         try {
             toDoService.updateToDo(updated);
@@ -54,7 +54,7 @@ public class ToDoController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         try {
             toDoService.deleteById(id);
             return ResponseEntity.ok().build();
